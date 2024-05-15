@@ -21,7 +21,7 @@ struct ChessPiece {
         value = c;
     }
     
-    ChessPiece(ChessPiece& other) {
+    ChessPiece(const ChessPiece& other) {
         value = other.value;
     }
     
@@ -480,8 +480,11 @@ struct ChessGame { // A chess game at some particular state
         return true;
     }
     
+    std::vector<ChessPiece> captures;
+    
     // Moves a piece regardless of legality. If certain conditions are met (e.g. enpassant, castling) those actions are taken.
     void execute(std::pair<int, int> src, std::pair<int, int> vec, bool verbose = false) {
+        captures.clear();
         std::pair<int, int> des = {src.first + vec.first, src.second + vec.second};
         ChessPiece temp = board[src.first][src.second];
         
@@ -543,6 +546,8 @@ struct ChessGame { // A chess game at some particular state
         else halfmoveclock++;
         board[src.first][src.second] = ChessPiece();
         
+        if (!board[des.first][des.second].isEmpty()) captures.push_back(board[des.first][des.second]);
+        
         board[des.first][des.second] = temp;
         
         Position enpassant;
@@ -554,8 +559,14 @@ struct ChessGame { // A chess game at some particular state
         if (verbose) std::cout << enpassant.toString() << ">>\n";
         
         if (enpassant.pp() == des) {
-            if (sidetomove) board[des.first][des.second - 1] = ChessPiece();
-            else board[des.first][des.second + 1] = ChessPiece();
+            if (sidetomove) {
+                captures.push_back(board[des.first][des.second - 1]);
+                board[des.first][des.second - 1] = ChessPiece();
+            }
+            else {
+                captures.push_back(board[des.first][des.second + 1]);
+                board[des.first][des.second + 1] = ChessPiece();
+            }
         }
         
         if (temp.isPawn()) {
