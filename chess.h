@@ -128,6 +128,9 @@ struct ChessGame { // A chess game at some particular state
     std::pair<bool, bool> castlek = {true, true};
     std::pair<char, char> eps = {-1, -1}; // Empty pair is always [-1, -1]. En passant always refers to files since from the file and side we can determine the rank.
     int halfmoveclock = 0; // Counts number of reversible moves since last event horizon
+    std::vector<ChessPiece> captures; // Captured pieces on the current move
+    
+    int maxmoves = 1000;
     
     ChessPiece board[8][8];
     
@@ -137,6 +140,7 @@ struct ChessGame { // A chess game at some particular state
         castleq = {true, true};
         castlek = {true, true};
         eps = {-1, -1};
+        maxmoves = 1000;
         
         reset();
     }
@@ -147,6 +151,9 @@ struct ChessGame { // A chess game at some particular state
         castlek = std::make_pair(other.castlek.first, other.castlek.second);
         eps = {other.eps.first, other.eps.second};
         halfmoveclock = other.halfmoveclock;
+        maxmoves = other.maxmoves;
+        
+        for (auto i : other.captures) captures.push_back(ChessPiece(i));
         
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) board[x][y] = ChessPiece(other.board[x][y]);
@@ -255,9 +262,9 @@ struct ChessGame { // A chess game at some particular state
         int x = s.first + bx;
         int y = s.second + by;
         
-        for (int i = 1; i < std::max(abs(dx), abs(dy)) - 1; i++) {
+        for (int i = 0; i < std::max(abs(dx), abs(dy)) - 1; i++) {
             if (!inBounds({x, y})) return false; // what the fuck are you doing???
-            if (board[x][y].isWhite() || board[x][y].isBlack()) return false; 
+            if (!board[x][y].isEmpty()) return false; 
             x += bx;
             y += by;
         }
@@ -480,8 +487,6 @@ struct ChessGame { // A chess game at some particular state
         return true;
     }
     
-    std::vector<ChessPiece> captures;
-    
     // Moves a piece regardless of legality. If certain conditions are met (e.g. enpassant, castling) those actions are taken.
     void execute(std::pair<int, int> src, std::pair<int, int> vec, bool verbose = false) {
         captures.clear();
@@ -546,7 +551,10 @@ struct ChessGame { // A chess game at some particular state
         else halfmoveclock++;
         board[src.first][src.second] = ChessPiece();
         
-        if (!board[des.first][des.second].isEmpty()) captures.push_back(board[des.first][des.second]);
+        if (!board[des.first][des.second].isEmpty()) {
+            if (verbose) std::cout << des.first << " " << des.second << board[des.first][des.second].toString() << " CAPTURED\n";
+            captures.push_back(ChessPiece(board[des.first][des.second]));
+        }
         
         board[des.first][des.second] = temp;
         
@@ -571,8 +579,8 @@ struct ChessGame { // A chess game at some particular state
         
         if (temp.isPawn()) {
             int you = (sidetomove) ? (1<<0) : (1<<1);
-            if (sidetomove && des.second == 7) board[des.first][des.second] = ChessPiece(you || (1<<6));
-            else if (!sidetomove && des.second == 0) board[des.first][des.second] = ChessPiece(you || (1<<6));
+            if (sidetomove && des.second == 7) board[des.first][des.second] = ChessPiece(you | (1<<6));
+            else if (!sidetomove && des.second == 0) board[des.first][des.second] = ChessPiece(you | (1<<6));
         }
     }
     
@@ -671,6 +679,118 @@ struct ChessGame { // A chess game at some particular state
         return res;
     }
     
+    // Get all instances where a piece can capture another piece of the same color if said piece was the opposing color.
+    std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> getDefenses(bool verbose = false) {
+        std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> res;
+        
+        int you = (sidetomove) ? (1<<0) : (1<<1);
+        
+        ChessPiece THISKING(you | (1<<7));
+        
+        if (verbose) {
+            for (auto p : getAllPieces(you | (1<<7))) std::cout << "K" << p.toString() << "\n";
+        }
+        
+        for (auto p : getAllPieces(you | (1<<2))) { // Pawns
+            int dy = (sidetomove) ? 1 : -1;
+            int dx[2] = {-1, 1};
+            for (int i = 1; i <= 2; i++) {
+                std::pair<int, int> vec = {dx[i], dy};
+                std::pair<int, int> des = {p.pos().first + vec.first, p.pos().second + vec.second};
+                if (inBounds(des)) {
+                    ChessPiece victim = board[des.first][des.second];
+                    if (!victim.isEmpty() && victim.getColor() == sidetomove) res.push_back({p.pos(), des});
+                }
+            }
+        }
+        
+        for (auto p : getAllPieces(you | (1<<3))) { // Knights
+            int dx[8] = {02, 01, -1, -2, -2, -1, 01, 02};
+            int dy[8] = {01, 02, 02, 01, -1, -2, -2, -1};
+            for (int i = 0; i < 8; i++) {
+                std::pair<int, int> vec = {dx[i], dy[i]};
+                std::pair<int, int> des = {p.pos().first + vec.first, p.pos().second + vec.second};
+                if (inBounds(des)) {
+                    ChessPiece victim = board[des.first][des.second];
+                    if (!victim.isEmpty() && victim.getColor() == sidetomove) res.push_back({p.pos(), des});
+                }
+            }
+        }
+        
+        for (auto p : getAllPieces(you | (1<<4))) { // Bishops
+            int dx[4] = {01, 01, -1, -1};
+            int dy[4] = {01, -1, 01, -1};
+            for (int i = 0; i < 4; i++) {
+                for (int k = 1; k < 9; k++) {
+                    std::pair<int, int> vec = {dx[i] * k, dy[i] * k};
+                    std::pair<int, int> des = {p.pos().first + vec.first, p.pos().second + vec.second};
+                    if (inBounds(des)) {
+                        ChessPiece victim = board[des.first][des.second];
+                        if (!victim.isEmpty() && victim.getColor() == sidetomove) {
+                            res.push_back({p.pos(), des});
+                            break; // Only one for sliding
+                        }
+                    }
+                }
+            }
+        }
+        
+        for (auto p : getAllPieces(you | (1<<5))) { // Rooks
+            int dx[4] = {00, 01, 00, -1};
+            int dy[4] = {01, 00, -1, 00};
+            for (int i = 0; i < 4; i++) {
+                for (int k = 1; k < 9; k++) {
+                    std::pair<int, int> vec = {dx[i] * k, dy[i] * k};
+                    std::pair<int, int> des = {p.pos().first + vec.first, p.pos().second + vec.second};
+                    if (inBounds(des)) {
+                        ChessPiece victim = board[des.first][des.second];
+                        if (!victim.isEmpty() && victim.getColor() == sidetomove) {
+                            res.push_back({p.pos(), des});
+                            break; // Only one for sliding
+                        }
+                    }
+                }
+            }
+        }
+        
+        for (auto p : getAllPieces(you | (1<<6))) { // Queens
+            int dx[8] = {00, 01, 01, 01, 00, -1, -1, -1};
+            int dy[8] = {01, 01, 00, -1, -1, -1, 00, 01};
+            for (int i = 0; i < 8; i++) {
+                for (int k = 1; k < 9; k++) {
+                    std::pair<int, int> vec = {dx[i] * k, dy[i] * k};
+                    std::pair<int, int> des = {p.pos().first + vec.first, p.pos().second + vec.second};
+                    if (inBounds(des)) {
+                        ChessPiece victim = board[des.first][des.second];
+                        if (!victim.isEmpty() && victim.getColor() == sidetomove) {
+                            res.push_back({p.pos(), des});
+                            break; // Only one for sliding
+                        }
+                    }
+                }
+            }
+        }
+        
+        for (auto p : getAllPieces(you | (1<<7))) { // Kings
+            int dx[8] = {00, 01, 01, 01, 00, -1, -1, -1};
+            int dy[8] = {01, 01, 00, -1, -1, -1, 00, 01};
+            for (int i = 0; i < 8; i++) {
+                for (int k = 1; k <= 1; k++) {
+                    std::pair<int, int> vec = {dx[i] * k, dy[i] * k};
+                    std::pair<int, int> des = {p.pos().first + vec.first, p.pos().second + vec.second};
+                    if (inBounds(des)) {
+                        ChessPiece victim = board[des.first][des.second];
+                        if (!victim.isEmpty() && victim.getColor() == sidetomove) {
+                            res.push_back({p.pos(), des});
+                        }
+                    }
+                }
+            }
+        }
+        
+        return res;
+    }
+    
     std::string dispLegals() {
         std::string res = "LEGAL MOVES FOR ";
         res = res + (sidetomove ? "WHITE" : "BLACK") + "\n";
@@ -682,8 +802,9 @@ struct ChessGame { // A chess game at some particular state
     }
     
     bool checkmate() { return getAllLegalMoves().size() == 0 && !noChecks(); }
-    bool stalemate() { return getAllLegalMoves().size() == 0 && noChecks(); }
-    bool gameover() { return getAllLegalMoves().size() == 0; }
+    bool TLE() { return halfmoveclock >= maxmoves; }
+    bool stalemate() { return TLE() || (getAllLegalMoves().size() == 0 && noChecks()); }
+    bool gameover() { return checkmate() || stalemate(); }
 };
 
 #endif
