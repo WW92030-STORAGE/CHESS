@@ -242,14 +242,14 @@ double randf() {
 
 ChessAI mutate(ChessAI ai) {
     ChessAI res(ai);
-    int beep = rand() % 128;
-    if (beep == 0) res.mob = randf() * 2;
-    if (beep == 1) res.rbndef = randf() * 2;
-    if (beep == 2) res.qdef = randf() * 2;
-    if (beep == 3) res.kmob = randf() * 2;
-    if (beep == 4) res.kdef = randf() * -2;
-    if (beep == 5) res.oo = randf() * 2;
-    if (beep == 6) res.chk = randf() * 2;
+    int beep = rand() % 64;
+    if (beep == 0) res.mob = randf() * 4 - 2;
+    if (beep == 1) res.rbndef = randf() * 4 - 2;
+    if (beep == 2) res.qdef = randf() * 4 - 2;
+    if (beep == 3) res.kmob = randf() * 4 - 2;
+    if (beep == 4) res.kdef = randf() * -4 + 2;
+    if (beep == 5) res.oo = randf() * 4 - 2;
+    if (beep == 6) res.chk = randf() * 4 - 2;
     // if (beep == 7) res.ckmt = randf() * 400;
     if (beep == 8) res.movecount = (0.5 - randf()) * 0.5;
     return res;
@@ -257,13 +257,13 @@ ChessAI mutate(ChessAI ai) {
 
 ChessAI randomAI() {
     ChessAI res;
-    res.mob = randf() * 2;
-    res.rbndef = randf() * 2;
-    res.qdef = randf() * 2;
-    res.kmob = randf() * 2;
-    res.kdef = randf() * -2;
-    res.oo = randf() * 2;
-    res.chk = randf() * 2;
+    res.mob = randf() * 4 - 2;
+    res.rbndef = randf() * 4 - 2;
+    res.qdef = randf() * 4 - 2;
+    res.kmob = randf() * 4 - 2;
+    res.kdef = randf() * -4 + 2;
+    res.oo = randf() * 4 - 2;
+    res.chk = randf() * 4 - 2;
     // if (beep == 7) res.ckmt = randf() * 400;
     res.movecount = (0.5 - randf()) * 0.5;
     return res;
