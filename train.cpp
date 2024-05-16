@@ -16,10 +16,11 @@ int main() {
     std::cout << "\n";
     
     for (int i = 0; i < 64; i++) {
+        std::cout << "GEN " << (i + 1) << "\n";
         std::vector<ChessAI> res = Genetic::tournament(v, true);
         std::random_shuffle(res.begin(), res.end());
         
-        for (auto i : res) std::cout << i.toString() << std::endl;
+        // for (auto i : res) std::cout << i.toString() << std::endl;
         
         v.clear();
         for (int i = 0; i < res.size() - 1; i += 2) {
