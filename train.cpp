@@ -2,6 +2,8 @@
 #include "chess.h"
 #include "genetic.h"
 
+// Train a chess bot using artificial selection.
+
 int main() {
     srand(time(0));
     
