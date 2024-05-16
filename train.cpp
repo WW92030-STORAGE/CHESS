@@ -8,7 +8,7 @@ int main() {
     srand(time(0));
     
     std::vector<ChessAI> v;
-    for (int i = 0; i < 64; i++) {
+    for (int i = 0; i < 128; i++) {
         ChessAI ai = Genetic::randomAI();
         v.push_back(Genetic::mutate(ai));
         std::cout << "X";

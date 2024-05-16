@@ -144,7 +144,7 @@ struct ChessGame { // A chess game at some particular state
         reset();
     }
     
-    ChessGame(ChessGame& other) {
+    ChessGame(const ChessGame& other) {
         sidetomove = other.sidetomove;
         castleq = std::make_pair(other.castleq.first, other.castleq.second);
         castlek = std::make_pair(other.castlek.first, other.castlek.second);
@@ -159,7 +159,7 @@ struct ChessGame { // A chess game at some particular state
         }
     }
     
-    const char backrank[8] = {(1<<5), (1<<3), (1<<4), (1<<6), (char)(128), (1<<4), (1<<3), (1<<5)};
+    char backrank[8] = {(1<<5), (1<<3), (1<<4), (1<<6), (char)(128), (1<<4), (1<<3), (1<<5)};
     
     void reset() {
         castleq = {true, true};
@@ -205,6 +205,21 @@ struct ChessGame { // A chess game at some particular state
             if (board[i % 8][i / 8] != other.board[i % 8][i / 8]) return board[i % 8][i / 8] < other.board[i % 8][i / 8];
         }
         return 0;
+    }
+
+    bool sameState(ChessGame& other) {
+        if (sidetomove != other.sidetomove) return false;
+        if (castleq != other.castleq) return false;
+        if (castlek != other.castlek) return false;
+        /*
+        if (eps != other.eps) return false;
+        if (halfmoveclock != other.halfmoveclock) return false;
+        */
+        
+        for (int i = 0; i < 64; i++) {
+            if (board[i % 8][i / 8] != other.board[i % 8][i / 8]) return false;
+        }
+        return true;
     }
     
     // Piece movement and interaction
@@ -786,6 +801,9 @@ struct ChessGame { // A chess game at some particular state
                 }
             }
         }
+        
+        // std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> res2;
+        // for (auto p : res) res2.push_back(std::make_pair(std::make_pair(p.first.first, p.first.second), std::make_pair(p.second.first, p.second.second)));
         
         return res;
     }
