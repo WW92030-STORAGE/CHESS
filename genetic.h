@@ -137,7 +137,8 @@ class ChessAI {
         return material + mobs * mob + kmob * kmobs + rbndef * rbndefs + qdef * qdefs + kdef * kdefs + chk * checks - movecnt * movecount;
     }
     
-    std::pair<std::pair<int, int>, std::pair<int, int>> pick(ChessGame game, bool verbose = false) {
+	// Maximizes your score after moving (opponent can do stuff later to lower it however)
+    std::pair<std::pair<int, int>, std::pair<int, int>> pickdepth1(ChessGame game, bool verbose = false) {
         std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> legals = game.getAllLegalMoves();
         if (legals.size() == 0) return {std::make_pair(-1, -1), std::make_pair(0, 0)};
         
@@ -163,6 +164,72 @@ class ChessAI {
         }
         return res;
     }
+
+	// Minimizes the score of the opponent after moving
+	std::pair<std::pair<int, int>, std::pair<int, int>> minoppd1(ChessGame game, bool verbose = false) {
+        std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> legals = game.getAllLegalMoves();
+        if (legals.size() == 0) return {std::make_pair(-1, -1), std::make_pair(0, 0)};
+        
+        std::pair<std::pair<int, int>, std::pair<int, int>> res = legals[0];
+        double maxscore = DBL_MAX;
+        for (auto p : legals) {
+            if (verbose) std::cout << "[" << p.first.first << " " << p.first.second << " > " << p.second.first << " " << p.second.second << "]\n";
+            ChessGame game2(game);
+            game2.execute(p.first, p.second);
+            if (verbose) for (auto i : game2.captures) std::cout << i.toString() << " ";
+            if (verbose) std::cout << "---\n";
+			game2.sidetomove = !game2.sidetomove;
+            double score = getScore(game2, verbose);
+            if (score < maxscore) {
+                maxscore = score;
+                res = p;
+            }
+            if (score == maxscore) {
+                if (rand() % 2 == 0) {
+                    maxscore = score;
+                    res = p;
+                }
+            }
+        }
+        return res;
+    }
+
+	// Minimaxes the opponent's response (so basically it picks the move such that if the opponent responds in a way that gives you the worst outcome this worst outcome is lessened).
+
+	std::pair<std::pair<int, int>, std::pair<int, int>> pickdepth2(ChessGame game, bool verbose = false) {
+		std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> legals = game.getAllLegalMoves();
+        if (legals.size() == 0) return {std::make_pair(-1, -1), std::make_pair(0, 0)};
+        
+        std::pair<std::pair<int, int>, std::pair<int, int>> res = legals[0];
+        double maxscore = -1 * DBL_MAX;
+
+		int x = 0;
+
+		for (auto p : legals) {
+			ChessGame game2(game);
+			game2.execute(p.first, p.second);
+			game2.sidetomove = !game2.sidetomove;
+			auto oppmove = minoppd1(game2, verbose);
+			game2.execute(oppmove.first, oppmove.second);
+			game2.sidetomove = !game2.sidetomove;
+
+			double score = getScore(game, verbose);
+			if (score > maxscore) {
+				maxscore = score;
+				res = p;
+			}
+			if (score == maxscore) {
+				if (rand() % 2 == 0) res = p;
+			}
+		}
+        
+
+		return res;
+	}
+
+	std::pair<std::pair<int, int>, std::pair<int, int>> pick(ChessGame game, bool verbose = false) {
+		return minoppd1(game, false);
+	}
     
     // mob / rbndef / qdef / kmob / kdef / oo / chk / ckmt / movecount
     

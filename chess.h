@@ -130,7 +130,7 @@ struct ChessGame { // A chess game at some particular state
     int halfmoveclock = 0; // Counts number of reversible moves since last event horizon
     std::vector<ChessPiece> captures; // Captured pieces on the current move
     
-    int maxmoves = 500;
+    int maxmoves = 100;
     
     ChessPiece board[8][8];
     
@@ -140,7 +140,6 @@ struct ChessGame { // A chess game at some particular state
         castleq = {true, true};
         castlek = {true, true};
         eps = {-1, -1};
-        maxmoves = 1000;
         
         reset();
     }

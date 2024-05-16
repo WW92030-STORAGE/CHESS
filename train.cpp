@@ -13,7 +13,7 @@ int main() {
     }
     std::cout << "\n";
     
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < 64; i++) {
         std::vector<ChessAI> res = Genetic::tournament(v, true);
         std::random_shuffle(res.begin(), res.end());
         
