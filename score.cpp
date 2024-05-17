@@ -26,7 +26,7 @@ int main() {
     int dr = 0;
 
 	for (int i = 0; i < 4; i++) {
-        int val = Genetic::test(res, Genetic::randomAI(), true);
+        int val = Genetic::test(res, res, true);
         if (val > 0) wb++;
         if (val < 0) bb++;
         if (val == 0) dr++;
