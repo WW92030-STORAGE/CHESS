@@ -186,7 +186,6 @@ class ChessAI {
 	// Minimizes the score of the opponent after moving
 	std::pair<std::pair<int, int>, std::pair<int, int>> minoppd1(ChessGame game, bool verbose = false, int maxcons = 32) {
         std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> legals = game.getAllLegalMoves();
-        std::cout << legals.size() << " LEGAL MOVES FOUND\n";
         if (legals.size() == 0) return {std::make_pair(-1, -1), std::make_pair(0, 0)};
         
         std::pair<std::pair<int, int>, std::pair<int, int>> res = legals[0];
@@ -245,7 +244,7 @@ class ChessAI {
 			game2.execute(oppmove.first, oppmove.second);
 			game2.sidetomove = !game2.sidetomove;
 
-			double score = getScore(game, verbose);
+			double score = getScore(game2, verbose);
 			if (score >= maxscore) {
 				maxscore = score;
 				res = std::make_pair(legals[i].first, legals[i].second);
@@ -260,8 +259,7 @@ class ChessAI {
 	}
 
 	std::pair<std::pair<int, int>, std::pair<int, int>> pick(ChessGame game, bool verbose = false) {
-    std::cout << game.toString() << "\n";
-		return minoppd1(game, verbose);
+	    return pickdepth2(game, false);
 	}
     
     // mob / rbndef / qdef / kmob / kdef / oo / chk / ckmt / movecount
@@ -285,7 +283,7 @@ int test(ChessAI a1, ChessAI a2, bool verbose = false) {
         game.execute(move.first, move.second);
         game.sidetomove = !game.sidetomove;
         
-        // if (verbose) std::cout << game.toString() << "\n";
+        if (verbose) std::cout << game.toString() << "\n";
             
         if (game.checkmate()) {
             if (verbose) std::cout << game.toString() << "\n";
@@ -312,7 +310,7 @@ std::vector<ChessAI> tournament(std::vector<ChessAI> ais, bool verbose = false) 
             if (rand() % 2 == 0) res.push_back(ChessAI(ais[i]));
             else res.push_back(ChessAI(ais[i + 1]));
         }
-        if (verbose) std::cout << "X";
+        if (verbose) std::cout << "X\n";
     }
     if (verbose) std::cout << "\n";
     return res;
