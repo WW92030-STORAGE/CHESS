@@ -439,10 +439,10 @@ struct ChessGame { // A chess game at some particular state
         if (!isLegalVector(piece, vec)) return false;
         if (piece.isPawn()) {
             if (sidetomove) {
-                if (src.second != 1 && abs(vec.second == 2)) return false;
+                if (src.second != 1 && abs(vec.second) == 2) return false;
             }
             else {
-                if (src.second != 6 && abs(vec.second == 2)) return false;
+                if (src.second != 6 && abs(vec.second) == 2) return false;
             }
         }
         
