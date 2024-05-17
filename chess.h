@@ -592,6 +592,10 @@ struct ChessGame { // A chess game at some particular state
         }
         
         if (temp.isPawn()) {
+            if (temp.isPawn() && (abs(vec.second) == 2)) {
+                if (sidetomove) eps.first = src.first;
+                else eps.second = src.first;
+            }
             int you = (sidetomove) ? (1<<0) : (1<<1);
             if (sidetomove && des.second == 7) board[des.first][des.second] = ChessPiece(you | (1<<6));
             else if (!sidetomove && des.second == 0) board[des.first][des.second] = ChessPiece(you | (1<<6));
