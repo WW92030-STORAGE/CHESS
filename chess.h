@@ -820,7 +820,19 @@ struct ChessGame { // A chess game at some particular state
     
     bool checkmate() { return getAllLegalMoves().size() == 0 && !noChecks(); }
     bool TLE() { return halfmoveclock >= maxmoves; }
-    bool stalemate() { return TLE() || (getAllLegalMoves().size() == 0 && noChecks()); }
+    bool stalemate() { 
+        if (TLE() || (getAllLegalMoves().size() == 0 && noChecks())) return true;
+
+        bool nonk = 0;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece piece = board[i][j];
+                if (!piece.isEmpty() && !piece.isKing()) nonk = 1;
+            }
+        } 
+
+        return !nonk;
+    }
     bool gameover() { return checkmate() || stalemate(); }
 };
 

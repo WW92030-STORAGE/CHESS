@@ -69,6 +69,8 @@ int main() {
 // depth = how many moves ahead (including current incoming move) the model looks ahead
 // maxgain = aims to maximize score for your side after your move / minopp = aims to minimize score for opponent after your move.
 
+// moves = 100 / depth = 2 / minmax (1.902865, 1.453464, 1.325278, 1.929444, -0.434348, -0.908216, 0.230627, 1000.000000, 0.110909)
+
 // moves = 100 / depth = 1 / minopp (0.123330, 0.265831, 0.897112, -0.111321, -0.363924, -1.067507, 1.903415, 1000.000000, -0.050465)
 // moves = 100 / depth = 1 / minopp (0.109726, -0.780763, 1.211751, 0.962076, 0.007741, 0.326344, 0.019265, 1000.000000, -0.007614)
 
