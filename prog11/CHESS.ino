@@ -106,16 +106,23 @@ void loop() {
 
   if (game.checkmate() || game.stalemate()) {
     game.reset();
+    delay(900);
   }
 
   delay(100);
 }
 
+int xoffset = 95;
 
 void render() {
   matrixpanel->clearScreen();
   for (int i = 0; i < 8; i++) {
-    for (int j = 0; j < 8; j++) matrixpanel->drawRect((i<<2), 28 - (j<<2), 5, 5, hex565(0x808080));
+    uint16_t bg = hex565(0x808080);
+    if (status == 1) bg = hex565(0xFF0000);
+    if (status == -1) bg = hex565(0x00FFFF);
+    if (status == 0) bg = hex565(0x404040);
+    for (int j = 0; j < 8; j++) matrixpanel->drawRect((i<<2), 28 - (j<<2), 5, 5, bg);
+    for (int j = 0; j < 8; j++) matrixpanel->drawRect((i<<2), 28 - (j<<2), 5, 5, bg);
   }
 
   std::pair<int, int> des = {src.first + vec.first, src.second + vec.second};
@@ -164,6 +171,63 @@ void render() {
 
       if (piece.isKing()) {
         matrixpanel->drawRect((x<<2) + 1, 28 - (y<<2) + 1, 3, 3, color);
+      }
+    }
+  }
+
+
+
+  for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 8; j++) matrixpanel->drawRect(xoffset + (i<<2), 28 - (j<<2), 5, 5, hex565(0x808080));
+    for (int j = 0; j < 8; j++) matrixpanel->drawRect(xoffset + (i<<2), 28 - (j<<2), 5, 5, hex565(0x808080));
+  }
+
+  // des = {src.first + vec.first, src.second + vec.second};
+
+  matrixpanel->drawPixel(xoffset + (src.first<<2), 28 - (src.second<<2), hex565(0xFFFFFF));
+  matrixpanel->drawPixel(xoffset + (src.first<<2) + 4, 28 - (src.second<<2), hex565(0xFFFFFF));
+  matrixpanel->drawPixel(xoffset + (src.first<<2), 28 - (src.second<<2) + 4, hex565(0xFFFFFF));
+  matrixpanel->drawPixel(xoffset + (src.first<<2) + 4, 28 - (src.second<<2) + 4, hex565(0xFFFFFF));
+
+  matrixpanel->drawRect(xoffset + ((des.first)<<2), 28 - (des.second<<2), 5, 5, hex565(0xFFFFFF));
+
+  for (int x = 0; x < 8; x++) {
+    for (int y = 0; y < 8; y++) {
+      ChessPiece piece = game.board[x][y];
+      uint16_t color = piece.getColor() ? hex565(0xFF0000) : hex565(0x00FFFF);
+      if (piece.isEmpty()) continue;
+
+      if (piece.isPawn()) matrixpanel->drawPixel(xoffset + (x<<2) + 2, 28 - (y<<2) + 2, color);
+      if (piece.isKnight()) {
+        matrixpanel->drawPixel(xoffset + (x<<2) + 1, 28 - (y<<2) + 1, color);
+        matrixpanel->drawPixel(xoffset + (x<<2) + 2, 28 - (y<<2) + 1, color);
+        matrixpanel->drawPixel(xoffset + (x<<2) + 3, 28 - (y<<2) + 1, color);
+        matrixpanel->drawPixel(xoffset + (x<<2) + 3, 28 - (y<<2) + 2, color);
+        matrixpanel->drawPixel(xoffset + (x<<2) + 3, 28 - (y<<2) + 3, color);
+      }
+
+      if (piece.isBishop()) {
+        matrixpanel->drawPixel(xoffset + (x<<2) + 1, 28 - (y<<2) + 1, color);
+        matrixpanel->drawPixel(xoffset + (x<<2) + 1, 28 - (y<<2) + 3, color);
+        matrixpanel->drawPixel(xoffset + (x<<2) + 2, 28 - (y<<2) + 2, color);
+        matrixpanel->drawPixel(xoffset + (x<<2) + 3, 28 - (y<<2) + 1, color);
+        matrixpanel->drawPixel(xoffset + (x<<2) + 3, 28 - (y<<2) + 3, color);
+      }
+
+      if (piece.isRook()) {
+        matrixpanel->drawPixel(xoffset + (x<<2) + 2, 28 - (y<<2) + 1, color);
+        matrixpanel->drawPixel(xoffset + (x<<2) + 2, 28 - (y<<2) + 3, color);
+        matrixpanel->drawPixel(xoffset + (x<<2) + 1, 28 - (y<<2) + 2, color);
+        matrixpanel->drawPixel(xoffset + (x<<2) + 3, 28 - (y<<2) + 2, color);
+        matrixpanel->drawPixel(xoffset + (x<<2) + 2, 28 - (y<<2) + 2, color);
+      }
+
+      if (piece.isQueen()) {
+        matrixpanel->fillRect(xoffset + (x<<2) + 1, 28 - (y<<2) + 1, 3, 3, color);
+      }
+
+      if (piece.isKing()) {
+        matrixpanel->drawRect(xoffset + (x<<2) + 1, 28 - (y<<2) + 1, 3, 3, color);
       }
     }
   }
