@@ -271,7 +271,7 @@ class ChessAI {
         if (isMaximizing) {
             double res = -1 * DBL_MAX;
             std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> legals = game.getAllLegalMoves();
-
+            std::random_shuffle(legals.begin(), legals.end());
             for (auto p : legals) {
                 ChessGame game2(game);
                 game2.execute(p.first, p.second);
@@ -293,6 +293,7 @@ class ChessAI {
         else {
             double res = DBL_MAX;
             std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> legals = game.getAllLegalMoves();
+            std::random_shuffle(legals.begin(), legals.end());
             for (auto p : legals) {
                 ChessGame game2(game);
                 game2.execute(p.first, p.second);
