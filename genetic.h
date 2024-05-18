@@ -260,8 +260,13 @@ class ChessAI {
 
     std::pair<std::pair<int, int>, std::pair<int, int>> chosenmove = {{0, 0}, {0, 0}};
 
+    int leafcount = 0;
+
     double abprune(ChessGame game, int remlayers, double alpha, double beta, bool isMaximizing) { // remlayers must start (outermost call) at an even number
-        if (remlayers <= 0) return getScore(game);
+        if (remlayers <= 0) {
+            leafcount++;
+            return getScore(game);
+        }
 
         if (isMaximizing) {
             double res = -1 * DBL_MAX;
@@ -296,7 +301,7 @@ class ChessAI {
                 double value = abprune(game2, remlayers - 1, alpha, beta, true);
                 if (value < res) {
                     res = value;
-                    chosenmove = p;
+                    // chosenmove = p;
                 }
                 beta = std::min(beta, res);
                 if (beta <= alpha) break;
@@ -310,8 +315,11 @@ class ChessAI {
 
 	std::pair<std::pair<int, int>, std::pair<int, int>> pick(ChessGame game, bool verbose = false) {
 	    // return pickdepth2(game, false);
+
+        leafcount = 0;
         chosenmove = game.getAllLegalMoves()[0];
         abprune(game, 2, -1 * DBL_MAX, DBL_MAX, true);
+        std::cout << leafcount << " LEAF NODES CHECKED\n";
         return chosenmove;
 	}
     
