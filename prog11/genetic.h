@@ -313,8 +313,8 @@ class ChessAI {
                     // chosenmove = p;
                 }
                 if (value == res && rand() % 2 == 0) {
-                    chosenmove = p;
-                    // res = value;
+                    // chosenmove = p;
+                    res = value;
                 }
                 beta = std::min(beta, res);
                 if (beta <= alpha) break;
