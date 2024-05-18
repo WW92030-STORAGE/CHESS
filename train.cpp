@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include "chess.h"
 #include "genetic.h"
@@ -19,7 +20,7 @@ int main() {
         std::cout << "GEN " << (i + 1) << "\n";
         std::vector<ChessAI> res = Genetic::tournament(v, true);
         
-        // for (auto i : res) std::cout << i.toString() << std::endl;
+        for (auto i : res) std::cout << i.toString() << std::endl;
         
         v.clear();
         for (int round = 0; round < 4; round++) {
