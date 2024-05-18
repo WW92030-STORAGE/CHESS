@@ -286,6 +286,10 @@ class ChessAI {
                     chosenmove = p;
                     res = value;
                 }
+                if (value == res && rand() % 2 == 0) {
+                    chosenmove = p;
+                    res = value;
+                }
                 alpha = std::max(alpha, res);
                 if (beta <= alpha) break;
             }
@@ -308,6 +312,10 @@ class ChessAI {
                     res = value;
                     // chosenmove = p;
                 }
+                if (value == res && rand() % 2 == 0) {
+                    chosenmove = p;
+                    // res = value;
+                }
                 beta = std::min(beta, res);
                 if (beta <= alpha) break;
             }
@@ -317,25 +325,6 @@ class ChessAI {
 
 
     }
-
-	std::pair<std::pair<int, int>, std::pair<int, int>> pick(ChessGame game, bool verbose = false) {
-	    // return pickdepth2(game, false);
-      leafcount = 0;
-        chosenmove = game.getAllLegalMoves()[0];
-        abprune(game, 2, -1 * DBL_MAX, DBL_MAX, true);
-        std::cout << leafcount << "\n";
-        return chosenmove;
-	}
-    
-    // mob / rbndef / qdef / kmob / kdef / oo / chk / ckmt / movecount
-    
-    std::string toString() {
-        std::string res = "MOB " + std::to_string(mob) + " RBN " + std::to_string(rbndef) + " QDEF " + std::to_string(qdef);
-        res = res + " KMOB " + std::to_string(kmob) + " KDEF " + std::to_string(kdef) + " OO " + std::to_string(oo);
-        res = res + " CHK " + std::to_string(chk) + " CKMT " + std::to_string(ckmt) + " MCNT " + std::to_string(movecount);
-        return res;
-    }
-};
 
 namespace Genetic {
     
