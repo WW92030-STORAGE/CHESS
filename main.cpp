@@ -19,7 +19,9 @@ void scoretable() {
 int main() {
     srand(time(0));
 
-	ChessAI res(0.123330, 0.265831, 0.897112, -0.111321, -0.363924, -1.067507, 1.903415, 1000.000000, -0.050465); // Example engine
+
+
+	ChessAI res(1.737785, 1.132054, 0.647298, 1.811029, 0.366649, 0.245674, 0.623615, 1000.000000, 0.101665); // Example engine
 
     int wb = 0;
     int bb = 0;
@@ -31,8 +33,9 @@ int main() {
         if (val > 0) wb++;
         if (val < 0) bb++;
         if (val == 0) dr++;
-        // std::cout << val << " ";
+        std::cout << val << " ";
     }
+    std::cout << "\n";
 	std::cout << wb << " " << bb << " | " << dr << "\n";
 
     wb = 0;
@@ -68,6 +71,8 @@ int main() {
 // moves = maximum number of idle moves (non-pawn or capture) until resignation
 // depth = how many moves ahead (including current incoming move) the model looks ahead
 // maxgain = aims to maximize score for your side after your move / minopp = aims to minimize score for opponent after your move.
+
+// moves = 100 / depth = 2 / minmax with alphabeta (1.737785, 1.132054, 0.647298, 1.811029, 0.366649, 0.245674, 0.623615, 1000.000000, 0.101665)
 
 // moves = 100 / depth = 2 / minmax (1.902865, 1.453464, 1.325278, 1.929444, -0.434348, -0.908216, 0.230627, 1000.000000, 0.110909)
 

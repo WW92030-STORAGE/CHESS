@@ -163,6 +163,7 @@ class ChessAI {
         std::pair<std::pair<int, int>, std::pair<int, int>> res = legals[0];
         double maxscore = -1 * DBL_MAX;
         for (auto p : legals) {
+            leafcount++;
             if (verbose) std::cout << "[" << p.first.first << " " << p.first.second << " > " << p.second.first << " " << p.second.second << "]\n";
             ChessGame game2(game);
             game2.execute(p.first, p.second);
@@ -194,6 +195,7 @@ class ChessAI {
         std::random_shuffle(legals.begin(), legals.end());
         
         for (int i = 0; i < maxcons && i < legals.size(); i++) {
+            leafcount++;
             auto p = legals[i];
             if (verbose) std::cout << "[" << p.first.first << " " << p.first.second << " > " << p.second.first << " " << p.second.second << "]\n";
             ChessGame game2(game);

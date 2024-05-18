@@ -20,18 +20,33 @@ int main() {
     srand(time(0));
 
 	ChessAI res(1.902865, 1.453464, 1.325278, 1.929444, -0.434348, -0.908216, 0.230627, 1000.000000, 0.110909); // Example engine
-
+	ChessAI res1(1.737785, 1.132054, 0.647298, 1.811029, 0.366649, 0.245674, 0.623615, 1000.000000, 0.101665);
     int wb = 0;
     int bb = 0;
     int dr = 0;
 
-	for (int i = 0; i < 4; i++) {
-        int val = Genetic::test(res, res, true);
+	for (int i = 0; i < 16; i++) {
+        int val = Genetic::test(res1, res, false);
         if (val > 0) wb++;
         if (val < 0) bb++;
         if (val == 0) dr++;
-        // std::cout << val << " ";
+        std::cout << val << " ";
     }
+	std::cout << "\n";
+	std::cout << wb << " " << bb << " | " << dr << "\n";
+
+	wb = 0;
+	bb = 0;
+	dr = 0;
+
+	for (int i = 0; i < 16; i++) {
+        int val = Genetic::test(res, res1, false);
+        if (val > 0) wb++;
+        if (val < 0) bb++;
+        if (val == 0) dr++;
+        std::cout << val << " ";
+    }
+	std::cout << "\n";
 	std::cout << wb << " " << bb << " | " << dr << "\n";
 
 	return 0;

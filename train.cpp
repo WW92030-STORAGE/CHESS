@@ -9,14 +9,14 @@ int main() {
     srand(time(0));
     
     std::vector<ChessAI> v;
-    for (int i = 0; i < 64; i++) {
+    for (int i = 0; i < 32; i++) {
         ChessAI ai = Genetic::randomAI();
         v.push_back(Genetic::mutate(ai));
         std::cout << "X";
     }
     std::cout << "\n";
     
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 32; i++) {
         std::cout << "GEN " << (i + 1) << "\n";
         std::vector<ChessAI> res = Genetic::tournament(v, true);
         
@@ -47,9 +47,9 @@ int main() {
 
 	std::cout << "PLAYING AS WHITE\n";
     
-    for (int i = 0; i < 16; i++) std::cout << Genetic::test(res[0], ChessAI(), false) << " ";
+    for (int i = 0; i < 32; i++) std::cout << Genetic::test(res[0], ChessAI(), false) << " ";
 	std::cout << "\n";
 
 	std::cout << "PLAYING AS BLACK\n";
-    for (int i = 0; i < 16; i++) std::cout << Genetic::test(ChessAI(), res[0], false) << " ";
+    for (int i = 0; i < 32; i++) std::cout << Genetic::test(ChessAI(), res[0], false) << " ";
 }
