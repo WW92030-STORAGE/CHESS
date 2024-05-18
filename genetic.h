@@ -258,8 +258,61 @@ class ChessAI {
 		return res;
 	}
 
+    std::pair<std::pair<int, int>, std::pair<int, int>> chosenmove = {{0, 0}, {0, 0}};
+
+    double abprune(ChessGame game, int remlayers, double alpha, double beta, bool isMaximizing) { // remlayers must start (outermost call) at an even number
+        if (remlayers <= 0) return getScore(game);
+
+        if (isMaximizing) {
+            double res = -1 * DBL_MAX;
+            std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> legals = game.getAllLegalMoves();
+
+            for (auto p : legals) {
+                ChessGame game2(game);
+                game2.execute(p.first, p.second);
+
+                game2.sidetomove = !game2.sidetomove;
+                double value = abprune(game2, remlayers - 1, alpha, beta, false);
+                if (value > res) {
+                    chosenmove = p;
+                    res = value;
+                }
+                alpha = std::max(alpha, res);
+                if (beta <= alpha) break;
+            }
+
+            return res;
+            
+        }
+
+        else {
+            double res = DBL_MAX;
+            std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> legals = game.getAllLegalMoves();
+            for (auto p : legals) {
+                ChessGame game2(game);
+                game2.execute(p.first, p.second);
+                game2.sidetomove = !game2.sidetomove;
+
+                double value = abprune(game2, remlayers - 1, alpha, beta, true);
+                if (value < res) {
+                    res = value;
+                    chosenmove = p;
+                }
+                beta = std::min(beta, res);
+                if (beta <= alpha) break;
+            }
+            return res;
+        }
+        return -1;
+
+
+    }
+
 	std::pair<std::pair<int, int>, std::pair<int, int>> pick(ChessGame game, bool verbose = false) {
-	    return pickdepth2(game, false);
+	    // return pickdepth2(game, false);
+        chosenmove = game.getAllLegalMoves()[0];
+        abprune(game, 2, -1 * DBL_MAX, DBL_MAX, true);
+        return chosenmove;
 	}
     
     // mob / rbndef / qdef / kmob / kdef / oo / chk / ckmt / movecount
