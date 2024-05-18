@@ -107,7 +107,9 @@ void loop() {
 
   if (game.checkmate() || game.stalemate()) {
     game.reset();
+    status = -100;
     delay(900);
+    render();
   }
 
   delay(100);
@@ -119,8 +121,8 @@ void render() {
   matrixpanel->clearScreen();
   for (int i = 0; i < 8; i++) {
     uint16_t bg = hex565(0x808080);
-    if (status == 1) bg = hex565(0xFF0000);
-    if (status == -1) bg = hex565(0x00FFFF);
+    if (status == 1) bg = hex565(0x00FFFF);
+    if (status == -1) bg = hex565(0xFF0000);
     if (status == 0) bg = hex565(0x404040);
     for (int j = 0; j < 8; j++) matrixpanel->drawRect((i<<2), 28 - (j<<2), 5, 5, bg);
     for (int j = 0; j < 8; j++) matrixpanel->drawRect((i<<2), 28 - (j<<2), 5, 5, bg);
