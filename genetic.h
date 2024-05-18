@@ -328,7 +328,7 @@ class ChessAI {
         leafcount = 0;
         chosenmove = game.getAllLegalMoves()[0];
         abprune(game, 2, -1 * DBL_MAX, DBL_MAX, true);
-        std::cout << leafcount << " LEAF NODES CHECKED\n";
+        if (verbose) std::cout << leafcount << " LEAF NODES CHECKED\n";
         return chosenmove;
 	}
     
@@ -380,7 +380,7 @@ std::vector<ChessAI> tournament(std::vector<ChessAI> ais, bool verbose = false) 
             if (rand() % 2 == 0) res.push_back(ChessAI(ais[i]));
             else res.push_back(ChessAI(ais[i + 1]));
         }
-        if (verbose) std::cout << "X\n";
+        if (verbose) std::cout << "X";
     }
     if (verbose) std::cout << "\n";
     return res;
