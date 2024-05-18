@@ -65,6 +65,7 @@ class ChessAI {
     }
     
     float getOneSidedScore(ChessGame game, bool verbose = false) {
+      // std::cout << "CALCULATING SCORE FOR " << game.sidetomove << "\n";
         double material = 0;
         /*
         if (verbose) std::cout << "{" << game.captures.size() << "}";
@@ -79,12 +80,13 @@ class ChessAI {
             for (int y = 0; y < 8; y++) {
                 ChessPiece piece = game.board[x][y];
                 if (!piece.isEmpty() && piece.getColor() == game.sidetomove) material += values[piece.getID()];
+                if (y >= 8) break;
             }
+            if (x >= 8) break;
         }
-                
         std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> legals = game.getAllLegalMoves();
         std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> defs = game.getDefenses();
-        
+
         double mobs = 0;
         std::map<std::pair<int, int>, int> pmoves;
         for (auto p : legals) {
@@ -186,6 +188,8 @@ class ChessAI {
 	// Minimizes the score of the opponent after moving
 	std::pair<std::pair<int, int>, std::pair<int, int>> minoppd1(ChessGame game, bool verbose = false, int maxcons = 32) {
         std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> legals = game.getAllLegalMoves();
+        // for (auto i : legals) std::cout << "[" << i.first.first << " " << i.first.second << " " << i.second.first << " " << i.second.second << "]";
+	      // std::cout << "\n";
         if (legals.size() == 0) return {std::make_pair(-1, -1), std::make_pair(0, 0)};
         
         std::pair<std::pair<int, int>, std::pair<int, int>> res = legals[0];
@@ -200,7 +204,7 @@ class ChessAI {
             game2.execute(p.first, p.second);
             if (verbose) for (auto i : game2.captures) std::cout << i.toString() << " ";
             if (verbose) std::cout << "---\n";
-			game2.sidetomove = !game2.sidetomove;
+			      game2.sidetomove = !game2.sidetomove;
             double score = getScore(game2, verbose);
             if (score < maxscore) {
                 maxscore = score;
@@ -220,8 +224,9 @@ class ChessAI {
 
 	std::pair<std::pair<int, int>, std::pair<int, int>> pickdepth2(ChessGame game, bool verbose = false, int maxcons = 32) {
 		std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> legals = game.getAllLegalMoves();
-		// for (auto i : legals) std::cout << "[" << i.first.first << " " << i.first.second << " " << i.second.first << " " << i.second.second << "]";
-		// std::cout << "\n";
+		for (auto i : legals) std::cout << "[" << i.first.first << " " << i.first.second << " " << i.second.first << " " << i.second.second << "]";
+	  std::cout << "\n";
+    dispstats();
         if (legals.size() <= 0) {
             // std::cout << "PICK FAILED\n";
             return {std::make_pair(-1, -1), std::make_pair(0, 0)};
@@ -232,11 +237,10 @@ class ChessAI {
 
 		int x = 0;
 		
-		// std::cout << "PICKING MOVE...\n";
+		std::cout << "PICKING MOVE...\n";
 		
-		// std::random_shuffle(legals.begin(), legals.end());
+		std::random_shuffle(legals.begin(), legals.end());
 		for (int i = 0; i < legals.size() && i < maxcons; i++) {
-		    // std::cout << i << " ";
 			ChessGame game2(game);
 			game2.execute(legals[i].first, legals[i].second);
 			game2.sidetomove = !game2.sidetomove;
@@ -254,7 +258,7 @@ class ChessAI {
 			}
 		}
 		
-		// std::cout << "\nMOVE PICKED\n";
+		std::cout << "\nMOVE PICKED\n";
 		return res;
 	}
 

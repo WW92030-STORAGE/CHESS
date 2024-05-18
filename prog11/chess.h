@@ -227,7 +227,9 @@ struct ChessGame { // A chess game at some particular state
     std::vector<Position> getAllPieces(char value) {
         std::vector<Position> res;
         for (int x = 0; x < 8; x++) {
-            for (int y = 0; y < 8; y++) if (board[x][y].value == value) res.push_back(Position(x, y));
+            for (int y = 0; y < 8; y++) {
+              if (board[x][y].value == value) res.push_back(Position(x, y));
+            }
         }
         return res;
     }
@@ -741,6 +743,8 @@ struct ChessGame { // A chess game at some particular state
                     ChessPiece victim = board[des.first][des.second];
                     if (!victim.isEmpty() && victim.getColor() == sidetomove) res.push_back({p.pos(), des});
                 }
+
+                if (i >= 2) break;
             }
         }
         
