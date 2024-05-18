@@ -264,13 +264,18 @@ class ChessAI {
 
 	std::pair<std::pair<int, int>, std::pair<int, int>> chosenmove = {{0, 0}, {0, 0}};
 
+  int leafcount = 0;
+
     double abprune(ChessGame game, int remlayers, double alpha, double beta, bool isMaximizing) { // remlayers must start (outermost call) at an even number
-        if (remlayers <= 0) return getScore(game);
+        if (remlayers <= 0) {
+            leafcount++;
+            return getScore(game);
+        }
 
         if (isMaximizing) {
             double res = -1 * DBL_MAX;
             std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> legals = game.getAllLegalMoves();
-
+            std::random_shuffle(legals.begin(), legals.end());
             for (auto p : legals) {
                 ChessGame game2(game);
                 game2.execute(p.first, p.second);
@@ -292,6 +297,7 @@ class ChessAI {
         else {
             double res = DBL_MAX;
             std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> legals = game.getAllLegalMoves();
+            std::random_shuffle(legals.begin(), legals.end());
             for (auto p : legals) {
                 ChessGame game2(game);
                 game2.execute(p.first, p.second);
@@ -314,8 +320,10 @@ class ChessAI {
 
 	std::pair<std::pair<int, int>, std::pair<int, int>> pick(ChessGame game, bool verbose = false) {
 	    // return pickdepth2(game, false);
+      leafcount = 0;
         chosenmove = game.getAllLegalMoves()[0];
         abprune(game, 2, -1 * DBL_MAX, DBL_MAX, true);
+        std::cout << leafcount << "\n";
         return chosenmove;
 	}
     
